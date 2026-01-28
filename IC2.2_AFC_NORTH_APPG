@@ -1,0 +1,268 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/kh408623-art/MIS2800/blob/main/IC2.2_AFC_NORTH_APPG\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import sqlite3"
+      ],
+      "metadata": {
+        "id": "r3pCMej30d1y"
+      },
+      "execution_count": 1,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#create AFC_North_APPG.db in temporary Colab local storage\n",
+        "conn = sqlite3.connect('AFC_North_APPG.db')\n"
+      ],
+      "metadata": {
+        "id": "879-7Pm00kkj"
+      },
+      "execution_count": 2,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Create a STRICT TABLE"
+      ],
+      "metadata": {
+        "id": "4mxA66Lm03FY"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#define a structure for the data table\n",
+        "conn.execute('''\n",
+        "CREATE TABLE AFC_North_APPG(\n",
+        "  team_name TEXT PRIMARY KEY NOT NULL,\n",
+        "  city Text,\n",
+        "  average_ppg Real,\n",
+        "  wins_2025 INTEGER,\n",
+        "  losses_2025 INTEGER)\n",
+        "  STRICT;\n",
+        "  ''')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7rd2gq7y09O0",
+        "outputId": "f5b018ec-1ff2-406a-9653-cd6bdf8b5846"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<sqlite3.Cursor at 0x7badfc8b8740>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Add Team Stats"
+      ],
+      "metadata": {
+        "id": "DOKsW-QS2oU8"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "conn.execute('''\n",
+        "INSERT INTO AFC_North_APPG (team_name, city, average_ppg, wins_2025, losses_2025)\n",
+        "VALUES ('Steelers', 'Pittsburgh', 23.4, 10, 7),\n",
+        "('Ravens', 'Baltimore', 24.9, 8, 9),\n",
+        "('Bengals', 'Cincinnatti', 24.4, 8, 9),\n",
+        "('Browns', 'Cleveland', 16.4,5,12);\n",
+        "''')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Vydnflwu2sd_",
+        "outputId": "f19af343-eeb4-45ce-f0c8-294be6d4401b"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<sqlite3.Cursor at 0x7badfc8ba340>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Filtering Teams"
+      ],
+      "metadata": {
+        "id": "9PPfxVLe3uDg"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#slicing the data to show only specific teams\n",
+        "query = \"SELECT * FROM AFC_North_APPG WHERE average_ppg > 20\"\n",
+        "results = conn.execute(query)\n",
+        "for row in results:\n",
+        "  print(row)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hgowOtmZ3wqC",
+        "outputId": "1937758a-f9e2-41e4-9d44-4a5f00dc8ebe"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "('Steelers', 'Pittsburgh', 23.4, 10, 7)\n",
+            "('Ravens', 'Baltimore', 24.9, 8, 9)\n",
+            "('Bengals', 'Cincinnatti', 24.4, 8, 9)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Sorting Data"
+      ],
+      "metadata": {
+        "id": "S694rtz74H1L"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#sort numercially for highest to lowest based on wins\n",
+        "query = \"Select team_name, wins_2025 FROM AFC_North_APPG ORDER BY wins_2025 DESC\"\n",
+        "for row in conn.execute(query):\n",
+        "  print(row)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "24HAdILD4KCj",
+        "outputId": "740917dd-6bb5-4c70-b703-64024f6d9664"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "('Steelers', 10)\n",
+            "('Ravens', 8)\n",
+            "('Bengals', 8)\n",
+            "('Browns', 5)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Find the teams that have an average ppg of at least 24 and 8 wins\n",
+        "query_AND = \"SELECT team_name, average_ppg, wins_2025 FROM AFC_North_APPG WHERE average_ppg >= 24 AND wins_2025 >= 8\"\n",
+        "for row in conn.execute(query_AND):\n",
+        "  print(row)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pRaHi6St5NzF",
+        "outputId": "1be1b999-0308-4599-ba9c-05589b558ac1"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "('Ravens', 24.9, 8)\n",
+            "('Bengals', 24.4, 8)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#find the teams that have an average ppg of at least 24 or 8 wins\n",
+        "query_OR = \"SELECT team_name, average_ppg, wins_2025 FROM AFC_North_APPG WHERE average_ppg >= 24 OR wins_2025 >= 8\"\n",
+        "for row in conn.execute(query_OR):\n",
+        "  print(row)"
+      ],
+      "metadata": {
+        "id": "eoG3zKNb6f7E",
+        "outputId": "f80140e4-701f-4e0c-8dc3-17be3c19599b",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "('Steelers', 23.4, 10)\n",
+            "('Ravens', 24.9, 8)\n",
+            "('Bengals', 24.4, 8)\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
